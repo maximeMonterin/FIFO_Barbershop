@@ -11,20 +11,38 @@ counting_semaphore semaphore{5};
 mutex doctorMut;
 
 
-void fct(unsigned j){
+void fct(const unsigned j){
     cout << "the doctor takes care of me, n°" << j << endl;
 
-    this_thread::sleep_for(40000ms); // do its action
+    this_thread::sleep_for(10000ms); // doctor doing its action
 
     cout << "finish n°" << j << endl;
     doctorMut.unlock();
+}
+
+void doctorAvailable(queue<Customer> & queue) {
+    this_thread::sleep_for(500ms); // wait for the first client
+
+    while (true) {
+        if (doctorMut.try_lock()) {
+            const Customer nextCustomer = queue.front();
+            queue.pop();
+            nextCustomer.doAction(&fct);
+
+            semaphore.release();
+        }
+
+        this_thread::sleep_for(100ms);
+    }
 }
 
 int main() {
     unsigned j = 0;
     queue<Customer> queue;
 
-    while(j < 100) {
+    thread processUpdate(doctorAvailable, ref(queue));
+
+    while(true) {
         ++j;
 
         if(semaphore.try_acquire()){
@@ -35,18 +53,11 @@ int main() {
             cout << "block n°" << j << endl;
         }
 
-        if (doctorMut.try_lock()) {
-            const Customer nextCustomer = queue.front();
-            queue.pop();
-            nextCustomer.doAction(&fct);
-
-            semaphore.release();
-        }
-
         this_thread::sleep_for(5000ms);
     }
 
     Customer::joinThreads();
+    processUpdate.join();
 
     return 0;
 }
