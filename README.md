@@ -19,6 +19,8 @@ To make the problem a little more concrete, the following information has been a
 - The barber thread, on the other hand, gracefully invokes `cutHair`.
 - When the barber executes `cutHair`, precisely one thread should concurrently invoke `getHairCut`.
 
+## 
+
 ### The Doctor's Office Problem 🚑👩‍⚕️
 
 Imagine a bustling doctor's office with a waiting room equipped with n chairs and the doctor's consultation room containing the prestigious doctor's chair. Here's the scenario: If the doctor has no patients waiting, they might take a quick break. However, the moment a patient enters the office and all chairs are occupied, the patient decides to patiently wait. If the doctor is busy examining another patient but there are empty chairs, the new patient takes a seat. But if the doctor is currently unavailable, it's the patient's responsibility to gently request their attention.
