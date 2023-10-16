@@ -1,34 +1,24 @@
-# FIFO_Barbershop
-School project about threads and mutex in c++
+Absolutely! Here's an emoji to add a bit of flair to your readme:
+
+# FIFO_Barbershop 💈🧑‍🦰
+
+This C++ school project delves into the realms of threads and mutex to solve the classic barbershop problem. Originally proposed by Dijkstra and later discussed in Silberschatz and Galvin's Operating Systems Concepts, this project brings the theoretical problem into practical coding.
 
 ## Introduction
 
-### The barbershop problem
+### The Barbershop Problem 💇‍♂️💺
 
-The original barbershop problem was proposed by Dijkstra. A variation of it
-appears in Silberschatz and Galvin’s Operating Systems Concepts.
+Picture a barbershop with a waiting room equipped with n chairs and the sacred barber room housing the all-important barber chair. Here's the scenario: If no customers await their turn, the barber gracefully dozes off. But, the moment a customer strolls in and all the chairs are occupied, the customer decides to gracefully exit the shop. If the barber is busy attending to someone else but there are vacant chairs, the customer happily takes a seat. However, if the barber is in a deep slumber, it's the customer's responsibility to wake them up. Your mission: craft a program to synchronize the barber and customers seamlessly.
 
-A barbershop consists of a waiting room with n chairs, and the
-barber room containing the barber chair. If there are no customers
-to be served, the barber goes to sleep. If a customer enters the
-barbershop and all chairs are occupied, then the customer leaves
-the shop. If the barber is busy, but chairs are available, then the
-customer sits in one of the free chairs. If the barber is asleep, the
-customer wakes up the barber. Write a program to coordinate the
-barber and the customers.
+To add a touch of practicality, I've thrown in a few specifics:
 
-To make the problem a little more concrete, I added the following information:
+- Customer threads will be calling a function named `getHairCut`.
+- Should a customer arrive when the shop is bursting with activity, they can invoke `balk`, a function that doesn't bother to return.
+- The barber thread, on the other hand, gracefully invokes `cutHair`.
+- When the barber executes `cutHair`, precisely one thread should concurrently invoke `getHairCut`.
+  
+Now, go ahead and craft a solution that dances to the rhythm of these constraints.
 
-- Customer threads should invoke a function named getHairCut.
-- If a customer thread arrives when the shop is full, it can invoke balk,
-which does not return.
-- The barber thread should invoke cutHair.
-- When the barber invokes cutHair there should be exactly one thread
-invoking getHairCut concurrently.
-Write a solution that guarantees these constraints.
+## Source Links
 
-## 
-
-### Source links
-
-Little Book Of Semaphores ( https://greenteapress.com/semaphores/LittleBookOfSemaphores.pdf )
+Dig deeper into the intricacies of synchronization and semaphores with the guidance of the "Little Book Of Semaphores" [PDF link](https://greenteapress.com/semaphores/LittleBookOfSemaphores.pdf). Let the semaphore journey begin! 📚✨
