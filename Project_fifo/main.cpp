@@ -1,44 +1,52 @@
 #include <iostream>
-#include <vector>
+#include <queue>
 #include <mutex>
 #include <semaphore>
-#include <thread>
+
+#include "Customer.h"
 
 using namespace std;
 
 counting_semaphore semaphore{5};
+mutex doctorMut;
+
 
 void fct(unsigned j){
-    cout << "test n°" << j << endl;
-    cout << "test id : " << this_thread::get_id() << endl;
+    cout << "the doctor takes care of me, n°" << j << endl;
 
-    this_thread::sleep_for(100000ms); // do its action
+    this_thread::sleep_for(40000ms); // do its action
 
     cout << "finish n°" << j << endl;
-    semaphore.release();
+    doctorMut.unlock();
 }
 
-int main()
-{
+int main() {
     unsigned j = 0;
-    vector<thread> threads;
+    queue<Customer> queue;
 
     while(j < 100) {
         ++j;
 
         if(semaphore.try_acquire()){
-            threads.push_back(thread(fct, j));
-        }
-        else{
+            queue.push(Customer(j));
+            cout << "new customer in the queue !" << endl;
+
+        } else {
             cout << "block n°" << j << endl;
+        }
+
+        if (doctorMut.try_lock()) {
+            const Customer nextCustomer = queue.front();
+            queue.pop();
+            nextCustomer.doAction(&fct);
+
+            semaphore.release();
         }
 
         this_thread::sleep_for(5000ms);
     }
 
-    for (thread & customer : threads) {
-        customer.join();
-    }
+    Customer::joinThreads();
 
     return 0;
 }
