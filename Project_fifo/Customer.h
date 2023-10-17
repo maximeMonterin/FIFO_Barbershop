@@ -4,14 +4,19 @@
 #include <vector>
 #include <thread>
 
+
 class Customer {
     private:
-        unsigned j;
+        // FIELDS
+        unsigned customerID;
 
     public:
-        Customer(const unsigned j);
-        void doAction(void (* fct)(unsigned)) const;
+        // CONSTRUCTOR
+        Customer(const unsigned id);
 
+
+        // METHODS
+        void doAction(void (* threadFunction)(unsigned)) const;
         static void joinThreads();
 };
 

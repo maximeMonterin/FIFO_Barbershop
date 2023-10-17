@@ -5,55 +5,74 @@
 
 #include "Customer.h"
 
-using namespace std;
+/*
+* CONSTANTS & GLOBAL VARIABLES
+*/
 
-counting_semaphore semaphore{5};
-mutex doctorMut;
+#define TIME_BETWEEN_EACH_CLIENTS 5000ms
+#define TIME_DOCTOR_ACTIVITY 10000ms
 
+std::counting_semaphore semaphore{5};
+std::mutex doctorMut;
 
-void fct(const unsigned j){
-    cout << "the doctor takes care of me, n°" << j << endl;
+/*
+* FUNCTIONS
+*/
 
-    this_thread::sleep_for(10000ms); // doctor doing its action
+void doctorActivity(const unsigned id){
+    std::cout << "the doctor takes care of me, n°" << id << std::endl;
 
-    cout << "finish n°" << j << endl;
+    // doctor doing its action
+    std::this_thread::sleep_for(TIME_DOCTOR_ACTIVITY);
+
+    std::cout << "doctor finish client n°" << id << std::endl;
     doctorMut.unlock();
 }
 
 void doctorAvailable(queue<Customer> & queue) {
-    this_thread::sleep_for(500ms); // wait for the first client
+    // wait for the first client (process in the main thread)
+    // very bad way to do this but no time to fix this in a better clean version
+    std::this_thread::sleep_for(700ms);
 
     while (true) {
         if (doctorMut.try_lock()) {
+            // get the next client in the queue and launch its action
             const Customer nextCustomer = queue.front();
-            queue.pop();
-            nextCustomer.doAction(&fct);
+            nextCustomer.doAction(&doctorActivity);
 
+            // release the queue and the semaphore counter
+            queue.pop();
             semaphore.release();
         }
 
-        this_thread::sleep_for(100ms);
+        std::this_thread::sleep_for(100ms);
     }
 }
 
+/*
+* MAIN PROGRAM (ENTRY POINT)
+*/
+
 int main() {
-    unsigned j = 0;
-    queue<Customer> queue;
+    unsigned clientCounter = 0;
+    std::queue<Customer> queue;
 
-    thread processUpdate(doctorAvailable, ref(queue));
+    // launch the thread that manage the doctor process
+    std::thread processUpdate(doctorAvailable, ref(queue));
 
+    // main program manage the customer flow in the shop
     while(true) {
-        ++j;
+        ++clientCounter;
 
         if(semaphore.try_acquire()){
-            queue.push(Customer(j));
-            cout << "new customer in the queue !" << endl;
+            queue.push(Customer(clientCounter));
+            std::cout << "new customer in the queue !" << std::endl;
 
         } else {
-            cout << "block n°" << j << endl;
+            std::cout << "client n°" << clientCounter << " leaves the shop !" << std::endl;
         }
 
-        this_thread::sleep_for(5000ms);
+        std::this_thread::sleep_for(TIME_BETWEEN_EACH_CLIENTS);
     }
 
     Customer::joinThreads();
