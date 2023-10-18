@@ -9,6 +9,8 @@
 * CONSTANTS & GLOBAL VARIABLES
 */
 
+using namespace std::chrono_literals;
+
 #define TIME_BETWEEN_EACH_CLIENTS 5000ms
 #define TIME_DOCTOR_ACTIVITY 10000ms
 
@@ -29,13 +31,17 @@ void doctorActivity(const unsigned id){
     doctorMut.unlock();
 }
 
-void doctorAvailable(queue<Customer> & queue) {
-    // wait for the first client (process in the main thread)
-    // very bad way to do this but no time to fix this in a better clean version
-    std::this_thread::sleep_for(700ms);
-
+void doctorAvailable(std::queue<Customer> & queue) {
     while (true) {
-        if (doctorMut.try_lock()) {
+        // if the doctor doesn't take care of a client and there are no customers in the queue,
+        // the doctor sleeping as the problem subject
+        if (queue.size() == 0 && doctorMut.try_lock()) {
+            doctorMut.unlock();
+
+            std::cout << "The doctor sleeping" << std::endl;
+            std::this_thread::sleep_for(700ms);
+
+        } else if (doctorMut.try_lock()) {
             // get the next client in the queue and launch its action
             const Customer nextCustomer = queue.front();
             nextCustomer.doAction(&doctorActivity);
@@ -45,6 +51,7 @@ void doctorAvailable(queue<Customer> & queue) {
             semaphore.release();
         }
 
+        // limit "FPS" of the thread no needs to refresh fast
         std::this_thread::sleep_for(100ms);
     }
 }
