@@ -1,5 +1,3 @@
-Absolutely! Here's an emoji to add a bit of flair to your readme:
-
 # FIFO_Barbershop 💈🧑‍🦰
 
 This C++ school project delves into the realms of threads and mutex to solve the classic barbershop problem. Originally proposed by Dijkstra and later discussed in Silberschatz and Galvin's Operating Systems Concepts, this project brings the theoretical problem into practical coding.
